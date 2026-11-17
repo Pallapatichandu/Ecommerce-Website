@@ -45,7 +45,7 @@ app.use("/api", couponRoutes);
 app.use("/api", adminRoutes);
 
 app.get("/", (req, res) => {
-  res.send("Backend Running");
+  res.send("hello chandu server is running");
 });
 
 export default app;
