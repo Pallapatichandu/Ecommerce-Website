@@ -34,7 +34,15 @@ const app =express();
    // CORS
 
 
-app.use(cors({origin:"http://localhost:5173",credentials:true}));
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://ecommerce-website-three-red-38.vercel.app"
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 
 
 
