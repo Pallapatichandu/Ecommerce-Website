@@ -19,11 +19,13 @@ dotenv.config();
 
 const app = express();
 
+// ===============================
 // CORS CONFIGURATION
+// ===============================
+
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://ecommerce-website-one-orpin.vercel.app",
-  "https://ecommerce-website-three-red-38.vercel.app"
+  "https://ecommerce-website-three-dusky.vercel.app"
 ];
 
 app.use(
@@ -32,18 +34,25 @@ app.use(
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error("Not allowed by CORS: " + origin));
+        console.log("Blocked by CORS:", origin);
+        callback(new Error("Not allowed by CORS"));
       }
     },
     credentials: true
   })
 );
 
+// ===============================
 // BODY PARSER
+// ===============================
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// ===============================
 // DATABASE CONNECTION
+// ===============================
+
 let dbPromise;
 
 app.use(async (req, res, next) => {
@@ -57,8 +66,9 @@ app.use(async (req, res, next) => {
 
     await dbPromise;
     next();
+
   } catch (error) {
-    console.error("Database connection failed:", error);
+    console.error("MongoDB Connection Error:", error);
 
     res.status(500).json({
       success: false,
@@ -67,39 +77,72 @@ app.use(async (req, res, next) => {
   }
 });
 
+// ===============================
 // PRODUCT ROUTES
+// ===============================
+
 app.use("/api", productRoutes);
 
+// ===============================
 // AUTH ROUTES
+// ===============================
+
 app.use("/api/auth", authrouter);
 
+// ===============================
 // CART ROUTES
+// ===============================
+
 app.use("/api", cartroutes);
 
+// ===============================
 // ORDER ROUTES
+// ===============================
+
 app.use("/api", orderroutes);
 
+// ===============================
 // PAYMENT ROUTES
+// ===============================
+
 app.use("/api", paymentrouter);
 
+// ===============================
 // USER ROUTES
+// ===============================
+
 app.use("/api", Userrouter);
 
+// ===============================
 // WISHLIST ROUTES
+// ===============================
+
 app.use("/api", wishlistRoutes);
 
+// ===============================
 // COUPON ROUTES
+// ===============================
+
 app.use("/api", couponRoutes);
 
+// ===============================
 // ADMIN ROUTES
+// ===============================
+
 app.use("/api", adminRoutes);
 
+// ===============================
 // HOME ROUTE
+// ===============================
+
 app.get("/", (req, res) => {
-  res.send("Hello Chandu! Backend is running.");
+  res.status(200).send("Hello Chandu! Backend is running.");
 });
 
+// ===============================
 // HEALTH CHECK
+// ===============================
+
 app.get("/health", (req, res) => {
   res.status(200).json({
     success: true,
@@ -107,7 +150,21 @@ app.get("/health", (req, res) => {
   });
 });
 
+// ===============================
+// 404 HANDLER
+// ===============================
+
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Route not found: ${req.method} ${req.originalUrl}`
+  });
+});
+
+// ===============================
 // LOCAL SERVER
+// ===============================
+
 if (!process.env.VERCEL) {
   app.listen(process.env.PORT || 8000, () => {
     console.log(
@@ -116,5 +173,8 @@ if (!process.env.VERCEL) {
   });
 }
 
+// ===============================
 // VERCEL EXPORT
+// ===============================
+
 export default app;
