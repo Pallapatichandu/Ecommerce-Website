@@ -1,180 +1,97 @@
-
 import express from "express";
+
 import cors from "cors";
+
 import dotenv from "dotenv";
 
-import { connetDB } from "./config/db.js";
+import { connetDB }from "./config/db.js";
 
 import productRoutes from "./routes/productRoutes.js";
+
 import authrouter from "./routes/authRoutes.js";
+
 import cartroutes from "./routes/cartRoutes.js";
+
 import orderroutes from "./routes/orderRoutes.js";
+
 import paymentrouter from "./routes/paymentRoutes.js";
+
 import Userrouter from "./routes/userRoutes.js";
+
 import wishlistRoutes from "./routes/wishlistRoutes.js";
+
 import couponRoutes from "./routes/couponRoutes.js";
+
 import adminRoutes from "./routes/adminRoutes.js";
 
 dotenv.config();
 
-const app = express();
+const app =express();
 
-// ===============================
-// CORS CONFIGURATION
-// ===============================
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://ecommerce-website-three-dusky.vercel.app"
-];
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.log("Blocked by CORS:", origin);
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true
-  })
-);
 
-// ===============================
-// BODY PARSER
-// ===============================
+   // CORS
+
+
+app.use(cors({origin:"http://localhost:5173",credentials:true}));
+
+
+
+   // BODY PARSER
+
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({extended:true}));
 
-// ===============================
-// DATABASE CONNECTION
-// ===============================
 
-let dbPromise;
 
-app.use(async (req, res, next) => {
-  try {
-    if (!dbPromise) {
-      dbPromise = connetDB().catch((error) => {
-        dbPromise = null;
-        throw error;
-      });
-    }
 
-    await dbPromise;
-    next();
+   // DATABASE
 
-  } catch (error) {
-    console.error("MongoDB Connection Error:", error);
 
-    res.status(500).json({
-      success: false,
-      message: "Database connection failed"
-    });
-  }
+connetDB();
+
+
+
+
+   // ROUTES
+
+
+app.use("/api",productRoutes);
+
+app.use("/api/auth",authrouter);
+
+app.use("/api",cartroutes);
+
+app.use("/api",orderroutes);
+
+app.use("/api",paymentrouter);
+
+app.use("/api",Userrouter);
+
+app.use("/api",wishlistRoutes);
+
+app.use("/api",couponRoutes);
+
+app.use("/api",adminRoutes);
+
+
+
+
+   // HOME
+
+
+app.get("/",(req,res)=>{
+
+   res.send(
+
+      `<h1>hello chandu</h1>`
+
+   );
+
 });
 
-// ===============================
-// PRODUCT ROUTES
-// ===============================
+app.listen(process.env.PORT,()=>console.log(`server is running http://localhost:${process.env.PORT}`)
 
-app.use("/api", productRoutes);
-
-// ===============================
-// AUTH ROUTES
-// ===============================
-
-app.use("/api/auth", authrouter);
-
-// ===============================
-// CART ROUTES
-// ===============================
-
-app.use("/api", cartroutes);
-
-// ===============================
-// ORDER ROUTES
-// ===============================
-
-app.use("/api", orderroutes);
-
-// ===============================
-// PAYMENT ROUTES
-// ===============================
-
-app.use("/api", paymentrouter);
-
-// ===============================
-// USER ROUTES
-// ===============================
-
-app.use("/api", Userrouter);
-
-// ===============================
-// WISHLIST ROUTES
-// ===============================
-
-app.use("/api", wishlistRoutes);
-
-// ===============================
-// COUPON ROUTES
-// ===============================
-
-app.use("/api", couponRoutes);
-
-// ===============================
-// ADMIN ROUTES
-// ===============================
-
-app.use("/api", adminRoutes);
-
-// ===============================
-// HOME ROUTE
-// ===============================
-
-app.get("/", (req, res) => {
-  res.status(200).send("Hello Chandu! Backend is running.");
-});
-
-// ===============================
-// HEALTH CHECK
-// ===============================
-
-app.get("/health", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Backend is working"
-  });
-});
-
-// ===============================
-// 404 HANDLER
-// ===============================
-
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: `Route not found: ${req.method} ${req.originalUrl}`
-  });
-});
-
-// ===============================
-// LOCAL SERVER
-// ===============================
-
-if (!process.env.VERCEL) {
-  app.listen(process.env.PORT || 8000, () => {
-    console.log(
-      `Server running on port ${process.env.PORT || 8000}`
-    );
-  });
-}
-
-// ===============================
-// VERCEL EXPORT
-// ===============================
-
-export default app;
+);;
