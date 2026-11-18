@@ -34,8 +34,13 @@ const app =express();
    // CORS
 
 
-app.use(cors({origin:"http://localhost:5173",credentials:true}));
-
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://ecommerce-website-2g8t.vercel.app"
+  ],
+  credentials: true
+}));
 
 
    // BODY PARSER
