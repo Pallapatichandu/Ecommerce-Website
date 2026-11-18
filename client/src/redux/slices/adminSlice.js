@@ -57,67 +57,33 @@ export const fetchAdminProducts = createAsyncThunk("admin/fetchAdminProducts",
    CREATE PRODUCT
 ========================================= */
 
-export const createProduct = createAsyncThunk("admin/createProduct",
 
-   async ({ formData, token }, thunkAPI) => {
+export const createProduct = createAsyncThunk(
+  "admin/createProduct",
 
-      try {
+  async ({ formData, token }, thunkAPI) => {
+    try {
+      const { data } = await api.post(
+        "/products",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
 
-         const response = await fetch("http://localhost:8000/api/products",
-
-            {
-
-               method: "POST",
-
-               headers: {
-
-                  Authorization:
-
-                     `Bearer ${token}`
-
-               },
-
-               body: formData
-
-            }
-
-         );
-
-
-
-         const data = await response.json();
-
-
-
-         if (!response.ok) {
-
-            throw new Error(
-
-               data.message
-
-            );
-
-         }
-
-
-
-         return data;
-
-      }
-
-      catch (error) {
-
-         return thunkAPI.rejectWithValue(
-
-            error.message
-
-         );
-
-      }
-
-   }
-
+      return data;
+    }
+    catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message ||
+        error.message
+      );
+    }
+  }
 );
+
 
 
 
