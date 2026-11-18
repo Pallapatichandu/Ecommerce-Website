@@ -96,11 +96,9 @@ export const makePayment = async(req,res)=>{
 
          mode:"payment",
 
-         success_url:
-         "http://localhost:5173/payment-success",
+         success_url: `${process.env.FRONTEND_URL}/payment-success`,
 
-         cancel_url:
-         "http://localhost:5173/cancel"
+cancel_url: `${process.env.FRONTEND_URL}/cancel`
 
       });
 
